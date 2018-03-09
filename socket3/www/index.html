@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>socket.io</title>
+</head>
+<body>
+    <input id="name" value=""/>
+    <button id="btn">OK</button>
+</body>
+</html>
+<script src="/socket.io/socket.io.js"></script> 
+<script>
+    var btn = document.getElementById('btn');
+    btn.addEventListener('click',function(){
+        console.log("开始即时通讯上传");
+        var socket = io();
+        console.log(document.getElementById('name').value);
+        socket.emit('sendMsg', document.getElementById('name').value);
+    });
+</script>
