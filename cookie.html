@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>JavaScript cookie</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript">
+        //页面加载事件
+        window.onload = function hello() {
+            //获取cookie
+            var cookie = document.cookie;
+            var username = prompt("请输入你用户名:", "");
+            if (username != "" && username != null) {
+                setCookie("username", username, 60);
+                document.title = "欢迎你 " + username + " !";
+                var OriginTitile = document.title, titleTime;
+                document.addEventListener('visibilitychange', function () {
+                    if (document.hidden) {
+                        document.title = '死鬼去哪里了！';
+                        clearTimeout(titleTime);
+                    } else {
+                        document.title = '(つェ⊂)咦!又好了!';
+                        titleTime = setTimeout(function () {
+                            document.title = OriginTitile;
+                        }, 2000);
+                    }
+                });
+            }
+        }
+
+
+
+        setInterval(() => {
+            document.getElementById('textConent').innerText = document.cookie.toString();
+        }, 10000);
+
+        function getCookie(c_name) {
+            // 先查询cookie是否为空，为空就return
+            if (document.cookie.length > 0) {
+                // 通过String对象的indexOf()来检查这个cookie是否存在，不存在就为 -1
+                c_start = document.cookie.indexOf(c_name + "=");
+                if (c_start !== -1) {
+                    //最后这个+1其实就是表示"="号啦，这样就获取到了cookie值的开始位置
+                    c_start = c_start + c_name.length + 1;
+                    // 其实我刚看见indexOf()第二个参数的时候猛然有点晕，后来想起来表示指定的开始索引的位置...这句是为了得到值的结束位置。因为需要考虑是否是最后一项，所以通过";"号是否存在来判断
+                    c_end = document.cookie.indexOf(";", c_start);
+                    if (c_end === -1) {
+                        c_end = document.cookie.length;
+                    }
+                    // 通过substring()得到了值。想了解unescape()得先知道escape()是做什么的，都是很重要的基础，想了解的可以搜索下，在文章结尾处也会进行讲解cookie编码细节
+                    return unescape(document.cookie.substring(c_start, c_end));
+                }
+                return "";
+            }
+        }
+
+        //设置cookie
+        //默认有效时间  为关闭浏览器
+        //默认保存路径为当前页面
+        function setCookie(c_name, value, expiredays, path) {
+            //存入名称，值，有效期。有效期到期事件是今天+有效天数。然后存储cookie，
+            var exdate = new Date();
+            //秒
+            exdate.setTime(exdate.getTime() + (expiredays * 1000));
+            //天
+            // exdate.setDate(exdate.getDate() + expiredays);
+            var cookie = c_name + "=" + escape(value) + ((expiredays == null) ? "" : "; expires=" + exdate.toGMTString()) + "; path=/" + (path == null ? "" : path);
+
+            document.cookie = cookie;
+        }
+
+        //删除cookie 不用指定值
+        function deleteCookie(c_name) {
+            document.cookie = c_name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        }
+    </script>
+</head>
+
+<body>
+    <p>
+        <button onclick="document.getElementById('textConent').innerText = document.cookie.toString()">显示所有cookie</button>
+        <div id="textConent"></div>
+    </p>
+    <p>
+        <input id="get_name" type="text" />
+        <button onclick="document.getElementById('get_value').innerText = getCookie(document.getElementById('get_name').value)">getCookie</button>
+        <div id="get_value"></div>
+    </p>
+    <p>
+        cookie_name：
+        <input id="c_name" type="text" /> cookie_value：
+        <input id="c_value" type="text" /> 保存秒数：
+        <input id="c_time" type="text" value="60" />
+        <button onclick="setCookie(document.getElementById('c_name').value,document.getElementById('c_value').value,document.getElementById('c_time').value)">添加cookie</button>
+    </p>
+    <p>
+        <input id="delete" type="text" />
+        <button onclick="deleteCookie(document.getElementById('delete').value)">删除cookie</button>
+    </p>
+</body>
+
+</html>
