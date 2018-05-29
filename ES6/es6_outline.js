@@ -151,7 +151,7 @@
     var fun = car.depreciate();
 }
 
-{//6.二进制和八进制字面量
+{//6. 二进制和八进制字面量
     //ES6 支持二进制和八进制的字面量，通过在数字前面添加 0o 或者0O 即可将其转换为八进制值：
     let oValue = 0o10;
     console.log(oValue); // 8
@@ -236,7 +236,7 @@
     }
 }
 
-{//11.Map 和 WeakMap
+{//11. Map 和 WeakMap
     //ES6 中两种新的数据结构集：Map 和 WeakMap。事实上每个对象都可以看作是一个 Map。
     //一个对象由多个 key-val 对构成，在 Map 中，任何类型都可以作为对象的 key，如：
     {
@@ -366,5 +366,173 @@
 
         console.log(ws.delete(obj)); // true
         console.log(ws.has(obj));    // false
+    }
+}
+
+{//13. 类
+    // ES6 中有 class 语法。值得注意是，这里的 class 不是新的对象继承模型，它只是原型链的语法糖表现形式。
+    // 函数中使用 static 关键词定义构造函数的的方法和属性：
+
+
+    {
+        class Task {
+            constructor() {
+                console.log("Task 实例化！");
+            }
+
+            showId() {
+                console.log(23);
+            }
+
+            static loadAll() {
+                console.log("调用方法");
+            }
+
+            static loadout(str) {
+                console.log("调用方法输出\t" + str);
+            }
+        }
+
+        console.log(typeof Task); // function
+        let task = new Task(); // "Task 实例化！"
+        task.showId(); // 23
+        Task.loadAll(); // "调用方法"
+        Task.loadout("TPC"); // "调用方法输出	TPC"
+
+        //static修饰的方法只能通过类名调用
+        //没有用static修饰的方法必须实例化类的对象才能调用
+    }
+
+    //类中的继承和超集：
+    {
+        class Car {
+            constructor() {
+                console.log("首先有了汽车");
+            }
+
+            initCar() {
+                console.log("初始化汽车");
+            }
+        }
+
+        class Porsche extends Car {
+            constructor() {
+                super();
+
+                console.log("后面才有了保时捷");
+            }
+            initPorsche() {
+                super.initCar();
+                console.log("恭喜你获得保时捷一辆");
+            }
+        }
+
+        let c = new Porsche();
+        // 首先有了汽车
+        // 后面才有了保时捷
+
+        c.initCar();//调用父类
+        //初始化汽车
+
+        c.initPorsche();//调用子类
+        //初始化汽车
+        //恭喜你获得保时捷一辆
+    }
+    //extends 允许一个子类继承父类，需要注意的是，子类的constructor 函数中需要执行 super() 函数。
+    // 当然，你也可以在子类方法中调用父类的方法，如super.parentMethodName()。
+    // 有几点值得注意的是：
+    //     类的声明不会提升（hoisting)，如果你要使用某个 Class，那你必须在使用之前定义它，否则会抛出一个 ReferenceError 的错误
+    //     在类中定义函数不需要使用 function 关键词
+}
+
+{//14. Symbol
+    //Symbol 是一种新的数据类型，它的值是唯一的，不可变的。ES6 中提出 symbol 的目的是为了生成一个唯一的标识符，不过你访问不到这个标识符：
+    var sym = Symbol("some optional description");
+    console.log(typeof sym); // symbol
+
+    // 注意，这里 Symbol 前面不能使用 new 操作符。
+    // 如果它被用作一个对象的属性，那么这个属性会是不可枚举的：
+
+    var o = {
+        val: 10,
+        [Symbol("random")]: "I'm a symbol",
+    };
+
+    console.log(Object.getOwnPropertyNames(o)); // [ 'val' ]
+    console.log(o);// { val: 10 }
+
+    // 如果要获取对象 symbol 属性，需要使用Object.getOwnPropertySymbols(o)。
+}
+
+{//15. 迭代器（Iterators）
+    // 迭代器允许每次访问数据集合的一个元素，当指针指向数据集合最后一个元素是，迭代器便会退出。它提供了 next() 函数来遍历一个序列，这个方法返回一个包含 done 和 value 属性的对象。
+    // ES6 中可以通过 Symbol.iterator 给对象设置默认的遍历器，无论什么时候对象需要被遍历，执行它的 @@iterator 方法便可以返回一个用于获取值的迭代器。
+    // 数组默认就是一个迭代器：
+
+
+    var arr = [11, 12, 13];
+    var itr = arr[Symbol.iterator]();
+
+    console.log(itr.next()); // { value: 11, done: false }
+    console.log(itr.next()); // { value: 12, done: false }
+    console.log(itr.next()); // { value: 13, done: false }
+
+    console.log(itr.next()); // { value: undefined, done: true }
+    // 你可以通过 [Symbol.iterator]() 自定义一个对象的迭代器
+}
+
+{//16. Generators
+    // Generator 函数是 ES6 的新特性，它允许一个函数返回的可遍历对象生成多个值。
+    // 在使用中你会看到 * 语法和一个新的关键词 yield:
+
+    function* infiniteNumbers() {
+        var n = 1;
+        while (true) {
+            yield n++;
+        }
+    }
+
+    var numbers = infiniteNumbers(); // returns an iterable object
+
+    console.log(numbers.next()); // { value: 1, done: false }
+    console.log(numbers.next()); // { value: 2, done: false }
+    console.log(numbers.next()); // { value: 3, done: false }
+
+    for (let i = 0; i < 10; i++) {
+        console.log(numbers.next());
+        // { value: 4, done: false }
+        // { value: 5, done: false }
+        // { value: 6, done: false }
+        // { value: 7, done: false }
+        // { value: 8, done: false }
+        // { value: 9, done: false }
+        // { value: 10, done: false }
+        // { value: 11, done: false }
+        // { value: 12, done: false }
+        // { value: 13, done: false }
+    }
+
+    // 每次执行 yield 时，返回的值变为迭代器的下一个值。
+}
+
+{//17. Promises
+    // ES6 对 Promise 有了原生的支持，一个 Promise 是一个等待被异步执行的对象，当它执行完成后，其状态会变成 resolved 或者rejected。
+    {
+        var p = new Promise(function (resolve, reject) {
+            if (true) {//条件
+                // fulfilled successfully
+                resolve(1);
+            } else {
+                // error, rejected
+                reject(2);
+            }
+        });
+    }
+    //每一个 Promise 都有一个 .then 方法，这个方法接受两个参数，第一个是处理 resolved 状态的回调，一个是处理 rejected 状态的回调：
+    {
+        p.then((val) => console.log("Promise Resolved", val),
+            (err) => console.log("Promise Rejected", err));
+        //true //Promise Resolved 1
+        //false //Promise Rejected 2
     }
 }
